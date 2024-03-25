@@ -3,10 +3,15 @@ Main driver file.
 Handling user input.
 Displaying current GameStatus object.
 """
+import os
+
 import pygame as p
 import ChessEngine, ChessAI
 import sys
 from multiprocessing import Process, Queue
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(script_dir, "images/")
 
 BOARD_WIDTH = BOARD_HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 250
@@ -24,7 +29,7 @@ def loadImages():
     """
     pieces = ['wp', 'wR', 'wN', 'wB', 'wK', 'wQ', 'bp', 'bR', 'bN', 'bB', 'bK', 'bQ']
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
+        IMAGES[piece] = p.transform.scale(p.image.load(model_path + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
 
 
 def main():
