@@ -65,7 +65,7 @@ piece_position_scores = {"wN": knight_scores,
 
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 3
+DEPTH = 4
 s_map = {}
 
 class state_D():
@@ -136,20 +136,20 @@ def findBestMove(game_state, valid_moves, return_queue):
     global next_move
     next_move = None
     random.shuffle(valid_moves)
-    if(game_state in s_map):
-        node = s_map[game_state]
-        return_queue.put(node.cur_move)
-    else:
-        node = state_D(game_state, None)
-        s_map[game_state] = node
-        node = build_tree_D(node,DEPTH)
-        K_depth_S(node, 0,DEPTH)
-        print(counte, " nodes were repeated")
-        print(len(s_map))
-        return_queue.put(node.cur_move)
-    # findMoveNegaMaxAlphaBeta(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
-    #                          1 if game_state.white_to_move else -1)
-    # return_queue.put(next_move)
+    # if(game_state in s_map):
+    #     node = s_map[game_state]
+    #     return_queue.put(node.cur_move)
+    # else:
+    #     node = state_D(game_state, None)
+    #     s_map[game_state] = node
+    #     node = build_tree_D(node,DEPTH)
+    #     K_depth_S(node, 0,DEPTH)
+    #     print(counte, " nodes were repeated")
+    #     print(len(s_map))
+    #     return_queue.put(node.cur_move)
+    findMoveNegaMaxAlphaBeta(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
+                             1 if game_state.white_to_move else -1)
+    return_queue.put(next_move)
 
 
 #K-depth approximation to the minimax approach using a static evaluation function

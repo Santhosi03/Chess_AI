@@ -15,10 +15,11 @@ model_path = os.path.join(script_dir, "images/")
 
 BOARD_WIDTH = BOARD_HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 250
-MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
+MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT - 200
 DIMENSION = 8
 SQUARE_SIZE = BOARD_HEIGHT // DIMENSION
 MAX_FPS = 15
+
 IMAGES = {}
 
 
@@ -38,6 +39,9 @@ def main():
     This will handle user input and updating the graphics.
     """
     p.init()
+    # Main game loop
+    player1_time = 600  # 10 minutes in seconds
+    player2_time = 600  # 10 minutes in seconds
     screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT))
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
@@ -58,7 +62,10 @@ def main():
     player_two = False  # if a hyman is playing white, then this will be True, else False
 
     while running:
+
         human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
+        if(human_turn):
+            player1_time -= clock.tick() / 1000  # Convert milliseconds to seconds
         for e in p.event.get():
             if e.type == p.QUIT:
                 p.quit()
@@ -113,6 +120,7 @@ def main():
 
         # AI move finder
         if not game_over and not human_turn and not move_undone:
+            player2_time -= clock.tick() / 1000  # Convert milliseconds to seconds
             if not ai_thinking:
                 ai_thinking = True
                 return_queue = Queue()  # used to pass data between threads
@@ -152,7 +160,13 @@ def main():
             game_over = True
             drawEndGameText(screen, "Stalemate")
 
-        clock.tick(MAX_FPS)
+        # clock.tick(MAX_FPS)
+        
+        
+
+        # Display timers
+        display_timer(screen,1, int(player1_time))
+        display_timer(screen,2, int(player2_time))
         p.display.flip()
 
 
@@ -176,6 +190,29 @@ def drawBoard(screen):
         for column in range(DIMENSION):
             color = colors[((row + column) % 2)]
             p.draw.rect(screen, color, p.Rect(column * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+
+
+# Function to draw text on the screen
+def draw_text(screen, text, font, color, x, y):
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect()
+    text_rect.topleft = (x, y)
+    screen.blit(text_surface, text_rect)
+
+# Function to display the timer
+def display_timer(screen, player, time_left):
+    font = p.font.Font(None, 36)
+    text = f"Player {player}: {time_left // 60:02d}:{time_left % 60:02d}"
+    if player == 1:
+        move_log_rect = p.Rect(BOARD_WIDTH, BOARD_HEIGHT - 100, MOVE_LOG_PANEL_WIDTH, 100)
+        p.draw.rect(screen, p.Color('gray'), move_log_rect)
+        draw_text(screen, text, font, p.Color('black'), BOARD_WIDTH + 20, BOARD_HEIGHT - 65)
+    else:
+        move_log_rect = p.Rect(BOARD_WIDTH, 0, MOVE_LOG_PANEL_WIDTH, 100)
+        p.draw.rect(screen, p.Color('gray'), move_log_rect)
+        draw_text(screen, text, font, p.Color('black'), BOARD_WIDTH + 20, 35)
+
+
 
 
 def highlightSquares(screen, game_state, valid_moves, square_selected):
@@ -220,7 +257,7 @@ def drawMoveLog(screen, game_state, font):
     Draws the move log.
 
     """
-    move_log_rect = p.Rect(BOARD_WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
+    move_log_rect = p.Rect(BOARD_WIDTH , 100, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
     p.draw.rect(screen, p.Color('black'), move_log_rect)
     move_log = game_state.move_log
     move_texts = []
