@@ -148,14 +148,20 @@ def main():
 
         if not game_over:
             drawMoveLog(screen, game_state, move_log_font)
+        
 
-        if game_state.checkmate:
+        if player1_time<=0:
+            game_over = True
+            drawEndGameText(screen, "Black wins by white timeout")
+        elif player2_time<=0:
+            game_over = True
+            drawEndGameText(screen, "White wins by black timeout")
+        elif game_state.checkmate:
             game_over = True
             if game_state.white_to_move:
                 drawEndGameText(screen, "Black wins by checkmate")
             else:
                 drawEndGameText(screen, "White wins by checkmate")
-
         elif game_state.stalemate:
             game_over = True
             drawEndGameText(screen, "Stalemate")
